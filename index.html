@@ -374,14 +374,19 @@
             
             const btn = document.getElementById('send-btn');
             const originalText = btn.innerHTML;
+            
             btn.innerHTML = "Abriendo WhatsApp...";
             btn.disabled = true;
             
+            // CORRECCIÓN PRINCIPAL: Redirección inmediata sin setTimeout
+            window.location.href = `https://wa.me/593995146145?text=${encodeURIComponent(msg)}`;
+            
+            // Restaurar botón después de unos segundos
             setTimeout(() => {
-                window.open(`https://wa.me/593995146145?text=${encodeURIComponent(msg)}`, '_blank');
                 btn.innerHTML = originalText;
                 btn.disabled = false;
-            }, 1500);
+                feather.replace();
+            }, 3000);
         });
     </script>
 </body>
