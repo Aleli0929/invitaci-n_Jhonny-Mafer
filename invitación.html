@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Revelación Mafer & Jhonny</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #f0ebe5;     /* Fondo de la página (gris/beige) */
+            --card-color: #fffefb;   /* Color de la tarjeta (crema) */
+            --text-main: #5d4037;    /* Café oscuro para texto */
+            --text-light: #8d6e63;   /* Café claro */
+            --gold: #d4af37;         /* Dorado */
+            --blue: #81d4fa;         /* Azul bebé */
+            --pink: #f8bbd0;         /* Rosa bebé */
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+            position: relative; /* Necesario para el fondo absoluto */
+        }
+
+        /* --- FONDO FLOTANTE (Emojis) --- */
+        #floating-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; /* Se coloca detrás de la tarjeta principal */
+            overflow: hidden;
+            pointer-events: none; /* Asegura que los clicks pasen a través */
+        }
+
+        .floating-item {
+            position: absolute;
+            bottom: -150px; /* Empieza fuera de la pantalla por abajo */
+            font-size: 50px; /* Tamaño base del emoji */
+            opacity: 0.25;  /* Sutil */
+            filter: grayscale(0.2); /* Un poco desaturado para que no moleste */
+            animation: floatUp linear infinite;
+            user-select: none; /* Evita selección de texto */
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+            100% {
+                /* Sube hasta arriba y rota un poco */
+                transform: translateY(-110vh) rotate(20deg) scale(1.1);
+            }
+        }
+
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        #main-container {
+            position: relative;
+            width: 100%; max-width: 400px;
+            min-height: 780px; 
+            perspective: 1000px;
+            z-index: 10; /* Asegura que la tarjeta esté por encima del fondo */
+        }
+
+        /* --- TARJETA LIMPIA Y ELEGANTE --- */
+        .card-screen {
+            position: absolute; top: 0; left: 0; width: 100%; min-height: 100%;
+            background-color: var(--card-color);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15); /* Sombra un poco más marcada para contrastar con el fondo móvil */
+            border: 8px solid #fff;
+            outline: 1px solid #e0e0e0;
+            padding: 30px 20px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+            transition: transform 0.8s ease, opacity 0.5s;
+            backface-visibility: hidden;
+        }
+
+        /* Tipografía */
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem; 
+            color: var(--text-main);
+            margin: 20px 0 15px 0;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem; 
+            color: var(--gold);
+            margin-bottom: 25px;
+            margin-top: 10px;
+        }
+
+        p {
+            font-size: 1.05rem; 
+            line-height: 1.8;
+            color: #666;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .highlight {
+            font-weight: 700;
+            color: var(--text-main);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        /* --- BOTONES --- */
+        .btn-start {
+            margin-top: 25px;
+            background: var(--text-main); color: #fff;
+            border: none; padding: 15px 40px;
+            border-radius: 50px;
+            font-family: 'Quicksand', sans-serif; font-weight: 700;
+            font-size: 1.1rem; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(93, 64, 55, 0.3);
+            transition: transform 0.2s, background 0.3s;
+        }
+        .btn-start:active { transform: scale(0.95); }
+        .btn-start:hover { background: var(--gold); }
+
+        /* --- DRESS CODE --- */
+        .dress-code-container {
+            display: flex; gap: 15px; width: 100%;
+            margin: 15px 0 30px 0;
+        }
+        .dress-card {
+            flex: 1; padding: 15px 10px; border-radius: 12px;
+            text-align: center; border: 1px solid #eee;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .dc-blue { background: #e3f2fd; color: #0277bd; border-color: #b3e5fc; }
+        .dc-pink { background: #fce4ec; color: #c2185b; border-color: #f8bbd0; }
+
+        /* --- SECCIONES DE REGALOS --- */
+        .gift-section {
+            width: 100%; text-align: left;
+            background: #fff; 
+            border: 1px solid #e0e0e0;
+            border-left: 4px solid var(--gold);
+            border-radius: 10px; padding: 20px 15px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .gift-header { 
+            font-weight: 700; color: var(--text-main); 
+            text-transform: uppercase; font-size: 0.9rem; margin-bottom: 12px;
+            border-bottom: 1px dashed #ddd; padding-bottom: 8px;
+        }
+
+        /* --- UTILS --- */
+        .form-container {
+             width: 100%; 
+             padding-bottom: 30px; 
+             margin-top: 10px;
+             border-top: 2px dashed #eee;
+             padding-top: 25px;
+        }
+
+        .vote-row { display: flex; gap: 15px; margin-bottom: 20px; width: 100%; }
+        .vote-btn { 
+            flex: 1; padding: 15px; background: #fff; border: 2px solid #ddd; 
+            border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input {
+            width: 100%; padding: 15px; margin-bottom: 15px;
+            border: 1px solid #ddd; border-radius: 10px;
+            font-family: 'Quicksand'; font-size: 1rem;
+            background: #fafafa;
+        }
+        input:focus { outline: none; border-color: var(--gold); background: #fff; }
+
+    </style>
+</head>
+<body>
+
+    <div id="floating-bg"></div>
+
+    <div id="main-container">
+
+        <div id="screen-1" class="card-screen">
+            <div style="height: 20px;"></div>
+            <h1>¡Tenemos una invitación para ti!</h1>
+            <div style="width: 50px; height: 3px; background: var(--gold); margin: 20px 0; opacity: 0.5;"></div>
+            <p style="margin-top: 15px; font-size: 1.3rem;">De parte de<br><strong style="font-size:1.8rem; color:var(--text-main); font-family: 'Dancing Script';">Jhonny & Mafer</strong></p>
+            <button class="btn-start" onclick="startExperience()">Abrir Invitación</button>
+        </div>
+
+        <div id="screen-2" class="card-screen" style="opacity: 0; pointer-events: none;">
+            <h2>Baby Shower<br>& Revelación</h2>
+            <p style="padding: 0 20px; font-size: 1.2rem;">Nuestro bebé está en camino y la emoción no nos cabe en el pecho.</p>
+            <div style="font-size: 1.5rem; font-weight: 700; margin: 30px 0; font-family: 'Dancing Script';">
+                ¿Será <span style="color: var(--blue); font-size: 2rem;">NIÑO</span> o <span style="color: var(--pink); font-size: 2rem;">NIÑA</span>?
+            </div>
+            <button class="btn-start" onclick="goToDetails()">Ver Detalles del Evento</button>
+        </div>
+
+        <div id="screen-3" class="card-screen" style="opacity: 0; pointer-events: none; justify-content: flex-start; padding-top: 40px; overflow-y: auto;">
+            
+            <h2 style="font-size: 2rem; margin-bottom: 25px; border-bottom: 2px solid var(--gold); padding-bottom: 10px; display: inline-block;">Detalles del Evento</h2>
+            
+            <div style="margin-bottom: 25px;">
+                <p class="highlight" style="font-size: 1.1rem; margin-bottom: 5px;"><i data-feather="calendar" style="width: 18px; vertical-align: middle;"></i> Viernes, 2 de Enero</p>
+                <p class="highlight" style="font-size: 1.1rem;"><i data-feather="clock" style="width: 18px; vertical-align: middle;"></i> 15:00 PM</p>
+            </div>
+
+            <p style="margin: 0; font-weight: 600;">San Felipe (Residencia Fuente Nueva)</p>
+            <a href="https://maps.app.goo.gl/wNoWRXQM4t78jkXP9" target="_blank" style="color: var(--gold); text-decoration: none; border-bottom: 1px solid; font-size: 0.95rem; margin-bottom: 35px; display: inline-block; margin-top: 8px; padding-bottom: 2px;">
+                <i data-feather="map-pin" style="width: 16px; vertical-align: middle;"></i> Ver Ubicación en Mapa
+            </a>
+
+            <p class="highlight" style="margin-bottom: 10px;">Código de Vestimenta</p>
+            <p style="font-size: 0.9rem; margin-bottom: 15px;">¡Vístete según tu intuición!</p>
+            <div class="dress-code-container">
+                <div class="dress-card dc-blue">
+                    <span style="font-size: 2rem;">🧢</span><br>
+                    <strong style="font-size: 1.1rem;">Azul</strong><br><span style="font-size:0.8rem; opacity: 0.8;">Team Niño</span>
+                </div>
+                <div class="dress-card dc-pink">
+                    <span style="font-size: 2rem;">🎀</span><br>
+                    <strong style="font-size: 1.1rem;">Rosa</strong><br><span style="font-size:0.8rem; opacity: 0.8;">Team Niña</span>
+                </div>
+            </div>
+
+            <div class="gift-section">
+                <div class="gift-header" style="color: var(--gold);"><i data-feather="gift" style="width: 18px; vertical-align: text-bottom;"></i> Regalo Principal</div>
+                <p style="margin-bottom: 0; font-size: 1.1rem;"><strong>Lluvia de Sobres</strong> (Efectivo)</p>
+                <p style="font-size: 0.85rem; margin-top: 5px; opacity: 0.7;">Habrá un buzón especial para tu sobre.</p>
+            </div>
+
+            <div class="form-container">
+                <p class="highlight" style="font-size: 1.2rem; margin-bottom: 20px;">¡Confirma tu Asistencia!</p>
+                <p style="margin-bottom: 15px; font-size: 0.95rem;">Primero, ¿Cuál es tu voto final?</p>
+            
+                <div class="vote-row">
+                    <button class="vote-btn" id="btn-boy" onclick="vote('boy')" style="color: var(--blue); border-color: var(--blue);">💙 Es Niño</button>
+                    <button class="vote-btn" id="btn-girl" onclick="vote('girl')" style="color: var(--pink); border-color: var(--pink);">💗 Es Niña</button>
+                </div>
+
+                <form id="rsvp-form">
+                    <input type="text" id="name" placeholder="Tu Nombre Completo" required>
+                    <input type="number" id="guests" placeholder="Número de personas (Incluyéndote)" min="1" max="10" required>
+                    
+                    <button type="submit" class="btn-start" id="send-btn" style="width: 100%; margin-top: 15px; background: #25D366; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <i data-feather="message-circle"></i> Enviar a WhatsApp
+                    </button>
+                </form>
+            </div>
+             <div style="height: 30px;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        feather.replace();
+        let myVote = null;
+
+        // --- FUNCIÓN PARA GENERAR EMOJIS MIXTOS (OSO Y BIBERÓN) ---
+        function createFloatingBackground() {
+            const bgContainer = document.getElementById('floating-bg');
+            const numItems = 20; // Cantidad de elementos
+            
+            // Array con los emojis a mezclar
+            const emojis = ['🐻', '🍼'];
+
+            for (let i = 0; i < numItems; i++) {
+                const item = document.createElement('span');
+                
+                // Selecciona aleatoriamente entre Osito o Biberón
+                item.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                item.classList.add('floating-item');
+
+                // Aleatorizar propiedades para que se vea natural
+                const leftPos = Math.random() * 100; 
+                const duration = 20 + Math.random() * 25; 
+                const delay = Math.random() * 20; 
+                const sizeScale = 0.8 + Math.random() * 0.5; 
+
+                item.style.left = `${leftPos}%`;
+                item.style.animationDuration = `${duration}s`;
+                item.style.animationDelay = `-${delay}s`; 
+                item.style.transform = `scale(${sizeScale})`;
+
+                bgContainer.appendChild(item);
+            }
+        }
+
+        // Ejecutar la creación al cargar
+        createFloatingBackground();
+
+
+        // --- FUNCIONES EXISTENTES ---
+        window.startExperience = () => {
+            const s1 = document.getElementById('screen-1');
+            const s2 = document.getElementById('screen-2');
+            
+            s1.style.opacity = '0';
+            s1.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                s2.style.opacity = '1';
+                s2.style.pointerEvents = 'all';
+                confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ['#81d4fa', '#f8bbd0', '#d4af37'] });
+            }, 500);
+        };
+
+        window.goToDetails = () => {
+            const s2 = document.getElementById('screen-2');
+            const s3 = document.getElementById('screen-3');
+            
+            s2.style.opacity = '0';
+            s2.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                s3.style.opacity = '1';
+                s3.style.pointerEvents = 'all';
+                document.getElementById('main-container').scrollIntoView({behavior: "smooth"});
+            }, 500);
+        };
+
+        window.vote = (type) => {
+            myVote = type;
+            document.getElementById('btn-boy').style.background = '#fff';
+            document.getElementById('btn-boy').style.color = 'var(--blue)';
+            document.getElementById('btn-girl').style.background = '#fff';
+            document.getElementById('btn-girl').style.color = 'var(--pink)';
+            
+            if(type === 'boy') {
+                document.getElementById('btn-boy').style.background = '#e1f5fe';
+                document.getElementById('btn-boy').style.color = '#01579b'; 
+            } else {
+                document.getElementById('btn-girl').style.background = '#fce4ec';
+                document.getElementById('btn-girl').style.color = '#880e4f'; 
+            }
+        };
+
+        document.getElementById('rsvp-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if(!myVote) { alert("Por favor, selecciona primero tu voto: ¿Niño o Niña?"); return; }
+
+            const name = document.getElementById('name').value;
+            const guests = document.getElementById('guests').value;
+            
+            const voteText = myVote === 'boy' ? "💙 Voto por NIÑO" : "💖 Voto por NIÑA";
+            
+            let msg = `¡Hola Jhonny y Mafer! 👋\n\nConfirmo mi asistencia a la revelación:\n👤 Nombre: ${name}\n🎟 Total personas: ${guests}\n🔮 Mi predicción: ${voteText}\n\n¡Nos vemos allá!`;
+            
+            const btn = document.getElementById('send-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "Abriendo WhatsApp...";
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                window.open(`https://wa.me/593995146145?text=${encodeURIComponent(msg)}`, '_blank');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
